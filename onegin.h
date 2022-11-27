@@ -24,11 +24,11 @@ typedef struct Onegin_file_struct // for array of char *
     size_t error_code = 0;
 }Onegin_type;
 
-typedef struct Onegin_string_struct // for single string
-{
-    char* string = nullptr;
-    int   number_of_char = 0;
-}String_type;
+// typedef struct Onegin_string_struct // for single string
+// {
+//     char* string = nullptr;
+//     int   number_of_char = 0;
+// }String_type;
 
 
 const char* Enum_to_string(size_t code); // converts an enum's int value to the enum's string value
@@ -43,4 +43,9 @@ void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION
 
 size_t get_num_of_chars_in_file(FILE* checked_file_onegin);
 
+void create_buffer_for_chars(size_t size_of_onegin, Onegin_type* onegin);
+
+void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin); // deletes all data of the struct onegin
+
+void onegin_debug_print(Onegin_type* onegin); // for debug only
 #endif
