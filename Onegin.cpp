@@ -3,20 +3,30 @@
 #define FUNC_NAME __func__
 #define FUNC_LINE __LINE__ 
 
-// int count_num_of_lines(FILE* file_with_onegin)
-// {
-//     int ch = 0;
-//     int number_of_lines = 0;
-//     while((ch = getc(fp_r)) != EOF)
+size_t count_num_of_lines_in_buf(Onegin_type* onegin)
+{
+    size_t number_of_lines = 0;
 
-//     if (ch == '\n')
-//     {
-//         number_of_lines++;
-//     }
-//     number_of_lines++;
-//     printf("Number of lines = %d", number_of_lines);
-//     return 0;
-// }
+    for(size_t i = 0; i < onegin->size_of_onegin; i++)
+    {   
+        if(onegin->buffer_of_chars[i] == '\n')
+        {   
+            number_of_lines++;
+            printf("onegin->buffer_of_chars[%ld] line %ld\n", i, number_of_lines);
+        }
+        if((onegin->buffer_of_chars[i] != '\n') && (i == (onegin->size_of_onegin - 1)))
+        {
+            onegin->buffer_of_chars[onegin->size_of_onegin] = '\n';
+            onegin->size_of_onegin++;
+            number_of_lines++;
+            printf("onegin->buffer_of_chars[%ld] line %ld\n", (i + 1), number_of_lines);
+            break;
+        }
+
+    }
+    printf("Number of lines = %ld\n\n", number_of_lines);
+    return 0;
+}
 
 FILE* check_onegin_for_openning() // checks the file with Onegin text for openning 
 {
@@ -50,32 +60,13 @@ FILE* check_sorted_file_for_openning() // checks the file with sorted Onegin tex
     }
 }
 
-void create_buffer_for_chars(size_t size_of_onegin, Onegin_type* onegin)
+void create_buffer_for_chars(Onegin_type* onegin) // allocates memory for buffer of chars
 {
-    onegin->buffer_of_chars = (char*)calloc(1, size_of_onegin * sizeof(char));
+    onegin->buffer_of_chars = (char*)calloc(1, onegin->size_of_onegin * sizeof(char));
     printf("Onegin buffer address: %p\n\n", onegin->buffer_of_chars);
-    // free(onegin->buffer_of_chars); //DELETE THIS
 }
 
-
-
-// void onegin_logic()
-// {   
-
-// }
-
-// int count_num_of_strings(FILE * )
-// {
-
-// }
-
-// void add_slash_n_to_string()
-// {
-
-// }
-
-
-const char* enum_to_string(size_t code) // converts an enum's int value to the enum's string value
+const char* enum_to_string(size_t code) // converts an enum's int value to the enum's string value 
 {
     switch(code)
     {
@@ -94,17 +85,16 @@ const char* enum_to_string(size_t code) // converts an enum's int value to the e
         case 5:
             return "ERR_CLOSE_SORTED_ONEGIN_TEXT";
             break;
-        // case 6:
-        //     return "";
-        //     break;
+        case 6:
+            return "";
+            break;
         default:
             return "STACK IS OK"; 
             break;
     }
 }
 
-
-void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE) // OK
+void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE) // CHECK
 {
     FILE* logfile = fopen("LOG.txt", "a+");
 
@@ -120,24 +110,24 @@ void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION
     fprintf(logfile, "Pointer to the buffer of chars: %p\n", onegin->buffer_of_chars);
     fprintf(logfile, "Current line: %ld\n", onegin->current_line);
     fprintf(logfile, "Total numver of lines: %ld\n", onegin->number_of_lines);
-
-
     fprintf(logfile, "--------------------END OF LOG--------------------------\n\n");
 
     fclose(logfile);
 }
 
-size_t get_num_of_chars_in_file(FILE* checked_file_onegin) // returns the sizeof(number of chars) onegin
+void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) // returns the sizeof(number of chars) onegin 
 {   
-    fseek(checked_file_onegin, 0, SEEK_END); // puts pointer to the end of file 
-    size_t size_of_onegin = ftell(checked_file_onegin); // returns total number of bytes (1 char = 1 byte) ->number of chars WITH \R!!!!!!!!!!
-    printf("Length onegin = %ld\n", size_of_onegin);
+    rewind(checked_file_onegin);
 
-    return size_of_onegin;
+    fseek(checked_file_onegin, 0, SEEK_END); // puts pointer to the end of file 
+    onegin->size_of_onegin = ftell(checked_file_onegin); // returns total number of bytes (1 char = 1 byte) ->number of chars WITH \R!!!!!!!!!!
+
+    rewind(checked_file_onegin);
+    printf("Length onegin = %ld\n", onegin->size_of_onegin);
 }
 
-void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin)
-{
+void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin) // frees all pointers and deletes 
+{                                                                                                  // all data about onegin struct
     free(onegin->buffer_of_chars); // frees the buffer of chars
     // for(size_t num_of_line = 0; num_of_line < onegin->number_of_lines; num_of_line++) // frees every line in the array of strings
     // {
@@ -157,12 +147,6 @@ void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_f
     fclose(checked_file_sorted_onegin);
 }
 
-
-// void onegin_logic()
-// {
-
-// }
-
 void onegin_debug_print(Onegin_type* onegin) // for debug only
 {
     printf("buffer_of_chars: %p\n", onegin->buffer_of_chars);
@@ -170,6 +154,80 @@ void onegin_debug_print(Onegin_type* onegin) // for debug only
     printf("current_line: %ld\n", onegin->current_line);
     printf("error_code: %ld\n", onegin->error_code);
     printf("number_of_lines: %ld\n\n", onegin->number_of_lines);
+}
+
+void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
+{   
+    rewind(checked_file_onegin);
+
+    printf("Buf address: %p\n", onegin->buffer_of_chars);
+    printf("Onegin size: %ld\n", onegin->size_of_onegin);
+    onegin->size_of_onegin = fread(onegin->buffer_of_chars, sizeof(char), onegin->size_of_onegin, checked_file_onegin);
+
+    rewind(checked_file_onegin);
+    printf("Returned value of fread: %ld\n\n", onegin->size_of_onegin);
+}
+
+// void onegin_struct_check(Onegin_type* onegin, const char * FUNCTION_NAME, size_t FUNCTION_LINE)
+// {
+//     if(onegin->buffer_of_chars == nullptr)
+//     {
+//         onegin->error_code = ERR_NULLPTR_BUFFER;
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if(onegin->strings == nullptr)
+//     {
+//         onegin->error_code = ERR_NULLPTR_STRINGS;
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if(onegin->current_line < 0)
+//     {
+//         onegin->error_code = ERR_NEGATIVE_CUR_LINE;
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if(onegin->number_of_lines < 0)
+//     {
+//         onegin->error_code = ERR_NEGATIVE_NUM_LINES;
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if(onegin->size_of_onegin == 0)
+//     {   
+//         onegin->error_code = ERR_EMPTY_FILE_ONEGIN_TEXT;
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+    // else if()
+    // {
+    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+    //     abort();
+    // }
+    // else if()
+    // {
+    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+    //     abort();
+    // }
+    // else if()
+    // {
+    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+    //     abort();
+    // }
+
+void skip_r_spaces(Onegin_type* onegin)
+{
+
+
 
 }
 

@@ -13,6 +13,10 @@ enum error_list
     ERR_EMPTY_FILE_ONEGIN_TEXT = 3,
     ERR_CLOSE_ONEGIN_TEXT = 4,
     ERR_CLOSE_SORTED_ONEGIN_TEXT = 5,
+    ERR_NULLPTR_BUFFER = 6,
+    ERR_NULLPTR_STRINGS = 7,
+    ERR_NEGATIVE_CUR_LINE = 8,
+    ERR_NEGATIVE_NUM_LINES = 9
 };
 
 typedef struct Onegin_file_struct // for array of char * 
@@ -21,15 +25,9 @@ typedef struct Onegin_file_struct // for array of char *
     char*  buffer_of_chars = nullptr; // the pointer to the buffer which is used in order to store all file's characters
     size_t current_line = 0; // 
     size_t number_of_lines = 0;
+    size_t size_of_onegin = 0;
     size_t error_code = 0;
 }Onegin_type;
-
-// typedef struct Onegin_string_struct // for single string
-// {
-//     char* string = nullptr;
-//     int   number_of_char = 0;
-// }String_type;
-
 
 const char* Enum_to_string(size_t code); // converts an enum's int value to the enum's string value
 
@@ -41,11 +39,18 @@ FILE* check_sorted_file_for_openning(); // checks for openning file with sorted 
 
 void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE); // OK
 
-size_t get_num_of_chars_in_file(FILE* checked_file_onegin);
+void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin);
 
-void create_buffer_for_chars(size_t size_of_onegin, Onegin_type* onegin);
+void create_buffer_for_chars(Onegin_type* onegin);
 
 void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin); // deletes all data of the struct onegin
 
 void onegin_debug_print(Onegin_type* onegin); // for debug only
+
+void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin);
+
+void onegin_struct_check(Onegin_type* onegin, const char * FUNCTION_NAME, size_t FUNCTION_LINE);
+
+size_t count_num_of_lines_in_buf(Onegin_type* onegin);
+
 #endif
