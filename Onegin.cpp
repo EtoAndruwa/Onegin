@@ -41,22 +41,36 @@ FILE* check_onegin_for_openning() // OK checks the file with Onegin text for ope
     }
     else
     {
-        printf("File Onegin was openned\n");
+        //printf("File Onegin was openned\n");
         return checked_file_onegin;
     }
 }
  
-FILE* check_sorted_file_for_openning() // OK checks the file with sorted Onegin text for openning 
+FILE* check_sorted_left_file_for_openning() // OK checks the file with sorted Onegin text for openning 
 {   
-    FILE * checked_file_sorted_onegin = fopen("Sorted_Onegin_text.txt", "wb"); 
-    if(checked_file_sorted_onegin == nullptr)
+    FILE * checked_left_file_sorted_onegin = fopen("Sorted_Left_Onegin_text.txt", "wb"); 
+    if(checked_left_file_sorted_onegin == nullptr)
     {
-        printf("ERROR: File with sorted Onegin text cannot be openned. Please, check file with sorted Onegin text.\n");
+        printf("ERROR: File with sorted Onegin left text cannot be openned. Please, check file with sorted Onegin text.\n");
     }
     else
     {
-        printf("File sorted Onegin was openned\n");
-        return checked_file_sorted_onegin;
+        //printf("File sorted Onegin was openned\n");
+        return checked_left_file_sorted_onegin;
+    }
+}
+
+FILE* check_sorted_right_file_for_openning() // OK checks the file with sorted Onegin text for openning 
+{   
+    FILE * checked_right_file_sorted_onegin = fopen("Sorted_Right_Onegin_text.txt", "wb"); 
+    if(checked_right_file_sorted_onegin == nullptr)
+    {
+        printf("ERROR: File with sorted Onegin right text cannot be openned. Please, check file with sorted Onegin text.\n");
+    }
+    else
+    {
+        //printf("File sorted Onegin was openned\n");
+        return checked_right_file_sorted_onegin;
     }
 }
 
@@ -123,10 +137,10 @@ void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) //
     onegin->size_of_onegin = ftell(checked_file_onegin); // returns total number of bytes (1 char = 1 byte) ->number of chars WITH \R!!!!!!!!!!
 
     rewind(checked_file_onegin);
-    printf("Length onegin = %ld\n", onegin->size_of_onegin);
+    //printf("Length onegin = %ld\n", onegin->size_of_onegin);
 }
 
-void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin) // frees all pointers and deletes 
+void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_left_sorted_onegin, FILE* checked_file_right_sorted_onegin) // frees all pointers and deletes 
 {                                                                                                  // all data about onegin struct
     free(onegin->buffer_of_chars); // frees the buffer of chars
     for(size_t i = 0; i < onegin->number_of_lines; i++) // frees every line in the array of strings
@@ -145,7 +159,8 @@ void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_f
     onegin->position_of_line_in_buffer = 0 ;
 
     fclose(checked_file_onegin);
-    fclose(checked_file_sorted_onegin);
+    fclose(checked_file_left_sorted_onegin);
+    fclose(checked_file_right_sorted_onegin);
 }
 
 void onegin_debug_print(Onegin_type* onegin) // for debug only
@@ -211,24 +226,24 @@ void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
 //         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
 //         abort();
 //     }
-    // else if()
-    // {
-    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-    //     abort();
-    // }
-    // else if()
-    // {
-    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-    //     abort();
-    // }
-    // else if()
-    // {
-    //     onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-    //     onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-    //     abort();
-    // }
+//     else if()
+//     {
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if()
+//     {
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
+//     else if()
+//     {
+//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
+//         abort();
+//     }
 
 void create_array_strings(Onegin_type* onegin)
 {
@@ -317,14 +332,17 @@ size_t strlen_slash_n_my(char* str) // returns the length of the string
     return i;
 }
 
-int comparator(const void* string_a, const void* string_b) // used in order to compare two strings
+int comparator_left_to_right(const void* string_a, const void* string_b) // used in order to compare two strings
 {
     return strcmp(*(const char **)string_a, *(const char **)string_b);
 }
 
-void sort_strings(Onegin_type* onegin) // sorts array of strings
+void sort_strings(Onegin_type* onegin, FILE* check_sorted_file_left_for_openning, FILE* check_sorted_file_right_for_openning) // sorts array of strings
 {   
-    qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator);
+    qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator_left_to_right);
+    print_strings_to_file(onegin, check_sorted_file_left_for_openning);
+    qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator_right_to_left);
+    print_strings_to_file(onegin, check_sorted_file_right_for_openning);  
 }
 
 // int check_for_spaces(char* start_of_string, char* end_of_string) // checks for empty strings
@@ -346,3 +364,27 @@ void sort_strings(Onegin_type* onegin) // sorts array of strings
 //     }
 //     return flag;
 // }
+
+int comparator_right_to_left(const void* string_a, const void* string_b) // used in order to compare two strings
+{   
+    size_t length_string_a = strlen_slash_n_my(*(char**)string_a);
+    size_t length_string_b = strlen_slash_n_my(*(char**)string_b);
+
+    char* right_position_of_string_a = *(char**)string_a + length_string_a;
+    char* right_position_of_string_b = *(char**)string_b + length_string_b;
+
+    while((*(char**)string_a != right_position_of_string_a) || (*(char**)string_b != right_position_of_string_b))
+    {
+        if(right_position_of_string_a[0] == right_position_of_string_b[0])
+        {
+            right_position_of_string_a--;
+            right_position_of_string_b--;
+        } 
+        else
+        {
+            return (right_position_of_string_a[0]-right_position_of_string_b[0]);
+        }
+    }
+}
+
+ 

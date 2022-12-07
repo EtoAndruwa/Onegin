@@ -33,7 +33,9 @@ const char* enum_to_string(size_t code); // converts an enum's int value to the 
 
 FILE* check_onegin_for_openning(); // checks the file for openning  with Onegin text
 
-FILE* check_sorted_file_for_openning(); // checks for openning file with sorted Onegin text
+FILE* check_sorted_left_file_for_openning(); // checks for openning file with sorted left Onegin text
+
+FILE* check_sorted_right_file_for_openning(); // checks for openning file with sorted right Onegin text
 
 void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE); // OK
 
@@ -49,7 +51,7 @@ void create_array_strings(Onegin_type* onegin);
 
 void onegin_debug_print(Onegin_type* onegin); // for debug only
 
-void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin);
+void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_left_sorted_onegin, FILE* checked_file_right_sorted_onegin);
 
 void create_buffer_for_chars(Onegin_type* onegin);
 
@@ -63,10 +65,12 @@ void fputs_my(char* string_to_fputs, FILE* check_sorted_file_for_openning);
 
 void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_openning);
 
-void sort_strings(Onegin_type* onegin);
+void sort_strings(Onegin_type* onegin, FILE* check_sorted_file_left_for_openning, FILE* check_sorted_file_right_for_openning);
 
-int comparator(const void* string_a, const void* string_b);
+int comparator_left_to_right(const void* string_a, const void* string_b);
 
 int check_for_spaces(char* start_of_string, char* end_of_string);
+
+int comparator_right_to_left(const void* string_a, const void* string_b);
 
 #endif

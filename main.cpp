@@ -7,7 +7,8 @@ int main()
     //onegin_debug_print(&onegin);
 
     FILE* onegin_file = check_onegin_for_openning();
-    FILE* onegin_sorted_file = check_sorted_file_for_openning();
+    FILE* onegin_sorted_left_file = check_sorted_left_file_for_openning();
+    FILE* onegin_sorted_right_file = check_sorted_right_file_for_openning();
 
     get_num_of_chars_in_file(onegin_file, &onegin);
     create_buffer_for_chars(&onegin);
@@ -17,10 +18,9 @@ int main()
     fill_the_array(&onegin);
 
     //onegin_debug_print(&onegin);
-    sort_strings(&onegin);
-    print_strings_to_file(&onegin, onegin_sorted_file);
+    sort_strings(&onegin, onegin_sorted_left_file, onegin_sorted_right_file);
 
-    onegin_dtor(&onegin, onegin_file, onegin_sorted_file);
+    onegin_dtor(&onegin, onegin_file, onegin_sorted_left_file, onegin_sorted_right_file);
     //onegin_debug_print(&onegin);
 
 
