@@ -13,6 +13,10 @@ int main()
     create_buffer_for_chars(&onegin);
     read_onegin_into_buf(onegin_file, &onegin);
     count_num_of_lines_in_buf(&onegin);
+    create_array_strings(&onegin);
+    fill_the_array(&onegin);
+
+    onegin_debug_print(&onegin);
 
     onegin_dtor(&onegin, onegin_file, onegin_sorted_file);
     onegin_debug_print(&onegin);

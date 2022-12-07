@@ -3,7 +3,7 @@
 #define FUNC_NAME __func__
 #define FUNC_LINE __LINE__ 
 
-size_t count_num_of_lines_in_buf(Onegin_type* onegin)
+size_t count_num_of_lines_in_buf(Onegin_type* onegin) // OK
 {
     size_t number_of_lines = 0;
 
@@ -22,13 +22,13 @@ size_t count_num_of_lines_in_buf(Onegin_type* onegin)
             printf("onegin->buffer_of_chars[%ld] line %ld\n", (i + 1), number_of_lines);
             break;
         }
-
     }
-    printf("Number of lines = %ld\n\n", number_of_lines);
+    onegin->number_of_lines = number_of_lines;
+    printf("Number of lines = %ld\n\n", onegin->number_of_lines);
     return 0;
 }
 
-FILE* check_onegin_for_openning() // checks the file with Onegin text for openning 
+FILE* check_onegin_for_openning() // OK checks the file with Onegin text for openning 
 {
     FILE* checked_file_onegin = fopen("Onegin_text.txt", "rb");//opens for reading
     if(checked_file_onegin == nullptr)
@@ -46,7 +46,7 @@ FILE* check_onegin_for_openning() // checks the file with Onegin text for openni
     }
 }
  
-FILE* check_sorted_file_for_openning() // checks the file with sorted Onegin text for openning 
+FILE* check_sorted_file_for_openning() // OK checks the file with sorted Onegin text for openning 
 {   
     FILE * checked_file_sorted_onegin = fopen("Sorted_Onegin_text.txt", "wb"); 
     if(checked_file_sorted_onegin == nullptr)
@@ -60,13 +60,13 @@ FILE* check_sorted_file_for_openning() // checks the file with sorted Onegin tex
     }
 }
 
-void create_buffer_for_chars(Onegin_type* onegin) // allocates memory for buffer of chars
+void create_buffer_for_chars(Onegin_type* onegin) // OK allocates memory for buffer of chars
 {
     onegin->buffer_of_chars = (char*)calloc(1, onegin->size_of_onegin * sizeof(char));
     printf("Onegin buffer address: %p\n\n", onegin->buffer_of_chars);
 }
 
-const char* enum_to_string(size_t code) // converts an enum's int value to the enum's string value 
+const char* enum_to_string(size_t code) // OK converts an enum's int value to the enum's string value 
 {
     switch(code)
     {
@@ -115,7 +115,7 @@ void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION
     fclose(logfile);
 }
 
-void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) // returns the sizeof(number of chars) onegin 
+void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) // OK returns the sizeof(number of chars) onegin 
 {   
     rewind(checked_file_onegin);
 
@@ -129,11 +129,11 @@ void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) //
 void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_sorted_onegin) // frees all pointers and deletes 
 {                                                                                                  // all data about onegin struct
     free(onegin->buffer_of_chars); // frees the buffer of chars
-    // for(size_t num_of_line = 0; num_of_line < onegin->number_of_lines; num_of_line++) // frees every line in the array of strings
-    // {
-    //     free(onegin->strings[num_of_line]);
-    //     onegin->strings[num_of_line] = nullptr;
-    // }
+    for(size_t i = 0; i < onegin->number_of_lines; i++) // frees every line in the array of strings
+    {
+        free(onegin->strings[i]);
+        onegin->strings[i] = nullptr;
+    }
     free(onegin->strings); // frees the pointer to the array of strings
 
     onegin->buffer_of_chars = nullptr;
@@ -142,6 +142,7 @@ void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_f
     onegin->current_line = 0;
     onegin->error_code = 0;
     onegin->number_of_lines = 0;
+    onegin->position_of_line_in_buffer = 0 ;
 
     fclose(checked_file_onegin);
     fclose(checked_file_sorted_onegin);
@@ -154,6 +155,11 @@ void onegin_debug_print(Onegin_type* onegin) // for debug only
     printf("current_line: %ld\n", onegin->current_line);
     printf("error_code: %ld\n", onegin->error_code);
     printf("number_of_lines: %ld\n\n", onegin->number_of_lines);
+
+    for(size_t i = 0; i < onegin->number_of_lines; i++)
+    {
+        printf("Strings[%ld] = %p\n", i, onegin->strings[i]);
+    }
 }
 
 void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
@@ -224,11 +230,41 @@ void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
     //     abort();
     // }
 
-void skip_r_spaces(Onegin_type* onegin)
+void create_array_strings(Onegin_type* onegin)
 {
-
-
-
+    onegin->strings = (char**)calloc(1, onegin->number_of_lines * sizeof(char*));   
+    printf("Address of array of pointer to strings: %p\n", onegin->strings);
 }
 
+char* get_string(Onegin_type* onegin) // gets pointer to the string
+{
+    char* string = nullptr;
 
+    char* start_of_string = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]); // stores old position of start
+    char* end_of_string = strchr_slash_n_my(onegin); // stores position of the end of the string
+
+    string = (char*)calloc(1, (end_of_string - start_of_string) * sizeof(char));
+    
+    strncpy(string, start_of_string, end_of_string - start_of_string); // copies characters from the buffer to the allocated memory cell
+
+    return string;
+}
+
+void fill_the_array (Onegin_type* onegin) // fills the array with pointers to the string
+{
+    for(size_t i = 0; i < onegin->number_of_lines; i++)
+    {
+        onegin->strings[i] = get_string(onegin); // gets pointer to the next string form the buffer
+    }
+}
+
+char* strchr_slash_n_my(Onegin_type* onegin)  // modified to search the character from specified position
+{                                                                                   
+    for(; onegin->position_of_line_in_buffer < onegin->size_of_onegin; onegin->position_of_line_in_buffer++) // from new start of line till the end of buffer
+    {
+        if(onegin->buffer_of_chars[onegin->position_of_line_in_buffer] == '\n')
+        {
+            return &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]);
+        }
+    }
+}
