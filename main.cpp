@@ -4,7 +4,7 @@ int main()
 {
     Onegin_type onegin = {};
 
-    onegin_debug_print(&onegin);
+    //onegin_debug_print(&onegin);
 
     FILE* onegin_file = check_onegin_for_openning();
     FILE* onegin_sorted_file = check_sorted_file_for_openning();
@@ -16,10 +16,12 @@ int main()
     create_array_strings(&onegin);
     fill_the_array(&onegin);
 
-    onegin_debug_print(&onegin);
+    //onegin_debug_print(&onegin);
+    sort_strings(&onegin);
+    print_strings_to_file(&onegin, onegin_sorted_file);
 
     onegin_dtor(&onegin, onegin_file, onegin_sorted_file);
-    onegin_debug_print(&onegin);
+    //onegin_debug_print(&onegin);
 
 
     return 0;

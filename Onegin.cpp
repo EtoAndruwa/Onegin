@@ -12,19 +12,19 @@ size_t count_num_of_lines_in_buf(Onegin_type* onegin) // OK
         if(onegin->buffer_of_chars[i] == '\n')
         {   
             number_of_lines++;
-            printf("onegin->buffer_of_chars[%ld] line %ld\n", i, number_of_lines);
+            //printf("onegin->buffer_of_chars[%ld] line %ld\n", i, number_of_lines);
         }
         if((onegin->buffer_of_chars[i] != '\n') && (i == (onegin->size_of_onegin - 1)))
         {
             onegin->buffer_of_chars[onegin->size_of_onegin] = '\n';
             onegin->size_of_onegin++;
             number_of_lines++;
-            printf("onegin->buffer_of_chars[%ld] line %ld\n", (i + 1), number_of_lines);
+            //printf("onegin->buffer_of_chars[%ld] line %ld\n", (i + 1), number_of_lines);
             break;
         }
     }
     onegin->number_of_lines = number_of_lines;
-    printf("Number of lines = %ld\n\n", onegin->number_of_lines);
+    //printf("Number of lines = %ld\n\n", onegin->number_of_lines);
     return 0;
 }
 
@@ -63,7 +63,7 @@ FILE* check_sorted_file_for_openning() // OK checks the file with sorted Onegin 
 void create_buffer_for_chars(Onegin_type* onegin) // OK allocates memory for buffer of chars
 {
     onegin->buffer_of_chars = (char*)calloc(1, onegin->size_of_onegin * sizeof(char));
-    printf("Onegin buffer address: %p\n\n", onegin->buffer_of_chars);
+    //printf("Onegin buffer address: %p\n\n", onegin->buffer_of_chars);
 }
 
 const char* enum_to_string(size_t code) // OK converts an enum's int value to the enum's string value 
@@ -166,12 +166,12 @@ void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
 {   
     rewind(checked_file_onegin);
 
-    printf("Buf address: %p\n", onegin->buffer_of_chars);
-    printf("Onegin size: %ld\n", onegin->size_of_onegin);
+    //printf("Buf address: %p\n", onegin->buffer_of_chars);
+    //printf("Onegin size: %ld\n", onegin->size_of_onegin);
     onegin->size_of_onegin = fread(onegin->buffer_of_chars, sizeof(char), onegin->size_of_onegin, checked_file_onegin);
 
     rewind(checked_file_onegin);
-    printf("Returned value of fread: %ld\n\n", onegin->size_of_onegin);
+    //printf("Returned value of fread: %ld\n\n", onegin->size_of_onegin);
 }
 
 // void onegin_struct_check(Onegin_type* onegin, const char * FUNCTION_NAME, size_t FUNCTION_LINE)
@@ -233,7 +233,7 @@ void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
 void create_array_strings(Onegin_type* onegin)
 {
     onegin->strings = (char**)calloc(1, onegin->number_of_lines * sizeof(char*));   
-    printf("Address of array of pointer to strings: %p\n", onegin->strings);
+    //printf("Address of array of pointer to strings: %p\n", onegin->strings);
 }
 
 char* get_string(Onegin_type* onegin) // gets pointer to the string
@@ -243,10 +243,22 @@ char* get_string(Onegin_type* onegin) // gets pointer to the string
     char* start_of_string = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]); // stores old position of start
     char* end_of_string = strchr_slash_n_my(onegin); // stores position of the end of the string
 
-    string = (char*)calloc(1, (end_of_string - start_of_string) * sizeof(char));
-    
-    strncpy(string, start_of_string, end_of_string - start_of_string); // copies characters from the buffer to the allocated memory cell
+    // if(check_for_spaces == 0)
+    // {
+    //     printf("Start of new line %ld, Start %p, End %p, length %ld\n", onegin->position_of_line_in_buffer, start_of_string,end_of_string, (end_of_string - start_of_string)+1);
+    //     string = (char*)calloc(1, ((end_of_string - start_of_string) + 1) * sizeof(char)); 
+    //     string = strncpy(string, start_of_string, (end_of_string - start_of_string) + 1); // copies characters from the buffer to the allocated memory cell
+    //     return string;
+    // }
+    // else
+    // {
+    //     onegin->position_of_line_in_buffer = onegin->position_of_line_in_buffer + (end_of_string - start_of_string);
+    //     return string;
+    // }
 
+    //printf("Start of new line %ld, Start %p, End %p, length %ld\n", onegin->position_of_line_in_buffer, start_of_string,end_of_string, (end_of_string - start_of_string)+1);
+    string = (char*)calloc(1, ((end_of_string - start_of_string) + 1) * sizeof(char)); 
+    string = strncpy(string, start_of_string, (end_of_string - start_of_string) + 1); // copies characters from the buffer to the allocated memory cell
     return string;
 }
 
@@ -259,12 +271,78 @@ void fill_the_array (Onegin_type* onegin) // fills the array with pointers to th
 }
 
 char* strchr_slash_n_my(Onegin_type* onegin)  // modified to search the character from specified position
-{                                                                                   
-    for(; onegin->position_of_line_in_buffer < onegin->size_of_onegin; onegin->position_of_line_in_buffer++) // from new start of line till the end of buffer
+{    
+    char* position = nullptr;
+    while(onegin->position_of_line_in_buffer < onegin->size_of_onegin)     
     {
         if(onegin->buffer_of_chars[onegin->position_of_line_in_buffer] == '\n')
-        {
-            return &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]);
+        {   
+            position = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]);
+            onegin->position_of_line_in_buffer++;
+            return position;
         }
+        else
+        {
+            onegin->position_of_line_in_buffer++;
+        }
+    }                                                                            
+}
+
+void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_openning) // prints all array of strings into the file Sorted_Onegin_text.txt
+{   
+    for(size_t i = 0; i < onegin->number_of_lines; i++)
+    {
+        fputs_my(onegin->strings[i], check_sorted_file_for_openning);
     }
 }
+
+void fputs_my(char* string_to_fputs, FILE* check_sorted_file_for_openning) // prints string into the file Sorted_Onegin_text.txt
+{   
+    //printf("%p", string_to_fputs);
+    size_t length = strlen_slash_n_my(string_to_fputs);
+    //printf("%ld\n", length);
+    for(size_t i = 0; i < length; i++)
+    {
+        fputc(string_to_fputs[i], check_sorted_file_for_openning);
+    }
+}
+
+size_t strlen_slash_n_my(char* str) // returns the length of the string
+{
+    size_t i = 0;
+    while (str[i] != '\n')
+    {
+        i++;
+    }
+    return i;
+}
+
+int comparator(const void* string_a, const void* string_b) // used in order to compare two strings
+{
+    return strcmp(*(const char **)string_a, *(const char **)string_b);
+}
+
+void sort_strings(Onegin_type* onegin) // sorts array of strings
+{   
+    qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator);
+}
+
+// int check_for_spaces(char* start_of_string, char* end_of_string) // checks for empty strings
+// {
+//     int flag = 0;
+//     size_t i = 0;
+//     while(i < end_of_string - start_of_string)
+//     {
+//         if(isspace((int)start_of_string[i]))
+//         {
+//             flag = 1;
+//         }
+//         else
+//         {
+//             flag = 0;
+//             break;
+//         }
+//         i++;
+//     }
+//     return flag;
+// }

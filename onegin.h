@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
 enum error_list
 {
@@ -55,5 +56,17 @@ void create_buffer_for_chars(Onegin_type* onegin);
 void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin);
 
 size_t count_num_of_lines_in_buf(Onegin_type* onegin);
+
+size_t strlen_slash_n_my(char* str);
+
+void fputs_my(char* string_to_fputs, FILE* check_sorted_file_for_openning);
+
+void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_openning);
+
+void sort_strings(Onegin_type* onegin);
+
+int comparator(const void* string_a, const void* string_b);
+
+int check_for_spaces(char* start_of_string, char* end_of_string);
 
 #endif
