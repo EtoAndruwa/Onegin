@@ -73,4 +73,10 @@ int check_for_spaces(char* start_of_string, char* end_of_string);
 
 int comparator_right_to_left(const void* string_a, const void* string_b);
 
+int strcmp_my(const char* string_a, const char* string_b);
+
+int strcmp_right_to_left(const char* string_a, const char* string_b);
+
+size_t strlen_slash_n_my_no_spaces(char* str);
+
 #endif

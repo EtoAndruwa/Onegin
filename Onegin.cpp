@@ -6,11 +6,14 @@
 size_t count_num_of_lines_in_buf(Onegin_type* onegin) // OK
 {
     size_t number_of_lines = 0;
+    size_t start = 0;
+    size_t end = 0;
 
     for(size_t i = 0; i < onegin->size_of_onegin; i++)
-    {   
+    {       
         if(onegin->buffer_of_chars[i] == '\n')
         {   
+
             number_of_lines++;
             //printf("onegin->buffer_of_chars[%ld] line %ld\n", i, number_of_lines);
         }
@@ -48,7 +51,7 @@ FILE* check_onegin_for_openning() // OK checks the file with Onegin text for ope
  
 FILE* check_sorted_left_file_for_openning() // OK checks the file with sorted Onegin text for openning 
 {   
-    FILE * checked_left_file_sorted_onegin = fopen("Sorted_Left_Onegin_text.txt", "wb"); 
+    FILE * checked_left_file_sorted_onegin = fopen("Sorted1.txt", "wb"); 
     if(checked_left_file_sorted_onegin == nullptr)
     {
         printf("ERROR: File with sorted Onegin left text cannot be openned. Please, check file with sorted Onegin text.\n");
@@ -62,7 +65,7 @@ FILE* check_sorted_left_file_for_openning() // OK checks the file with sorted On
 
 FILE* check_sorted_right_file_for_openning() // OK checks the file with sorted Onegin text for openning 
 {   
-    FILE * checked_right_file_sorted_onegin = fopen("Sorted_Right_Onegin_text.txt", "wb"); 
+    FILE * checked_right_file_sorted_onegin = fopen("Sorted2.txt", "wb"); 
     if(checked_right_file_sorted_onegin == nullptr)
     {
         printf("ERROR: File with sorted Onegin right text cannot be openned. Please, check file with sorted Onegin text.\n");
@@ -334,7 +337,7 @@ size_t strlen_slash_n_my(char* str) // returns the length of the string
 
 int comparator_left_to_right(const void* string_a, const void* string_b) // used in order to compare two strings
 {
-    return strcmp(*(const char **)string_a, *(const char **)string_b);
+    return strcmp_my(*(const char **)string_a, *(const char **)string_b);
 }
 
 void sort_strings(Onegin_type* onegin, FILE* check_sorted_file_left_for_openning, FILE* check_sorted_file_right_for_openning) // sorts array of strings
@@ -373,18 +376,118 @@ int comparator_right_to_left(const void* string_a, const void* string_b) // used
     char* right_position_of_string_a = *(char**)string_a + length_string_a;
     char* right_position_of_string_b = *(char**)string_b + length_string_b;
 
-    while((*(char**)string_a != right_position_of_string_a) || (*(char**)string_b != right_position_of_string_b))
+    if((strlen_slash_n_my_no_spaces(*(char**)string_a) == 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) == 0))
     {
-        if(right_position_of_string_a[0] == right_position_of_string_b[0])
+        return 0;
+    }
+    else if((strlen_slash_n_my_no_spaces(*(char**)string_a) == 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) != 0))
+    {
+        return 1;
+    }
+    else if((strlen_slash_n_my_no_spaces(*(char**)string_a) != 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) == 0))
+    {
+        return -1;
+    }
+    else
+    {  
+        while((*(char**)string_a != right_position_of_string_a) || (*(char**)string_b != right_position_of_string_b))
         {
-            right_position_of_string_a--;
-            right_position_of_string_b--;
-        } 
-        else
-        {
-            return (right_position_of_string_a[0]-right_position_of_string_b[0]);
+            if((isalpha(right_position_of_string_a[0]) != 0) && (isalpha(right_position_of_string_b[0]) != 0))
+            {
+                if(tolower(right_position_of_string_a[0]) == tolower(right_position_of_string_b[0]))
+                {
+                    right_position_of_string_a--;
+                    right_position_of_string_b--;
+                } 
+                else
+                {
+                    return (tolower(right_position_of_string_a[0]) - tolower(right_position_of_string_b[0]));
+                }
+            }
+            else if((isalpha(right_position_of_string_a[0]) != 0) && (isalpha(right_position_of_string_b[0]) == 0))
+            {
+                right_position_of_string_b--;
+            }
+            else if((isalpha(right_position_of_string_a[0]) == 0) && (isalpha(right_position_of_string_b[0]) != 0))
+            {
+                right_position_of_string_a--;
+            }
+            else
+            {
+                right_position_of_string_a--;
+                right_position_of_string_a--;
+            }
         }
     }
+}
+
+int strcmp_my(const char* string_a, const char* string_b)
+{   
+    size_t length_string_a = strlen_slash_n_my((char*)string_a);
+    size_t length_string_b = strlen_slash_n_my((char*)string_b);
+
+    char* right_position_of_string_a = (char*)string_a + length_string_a;
+    char* right_position_of_string_b = (char*)string_b + length_string_b;
+
+    if((strlen_slash_n_my_no_spaces((char*)string_a) == 0) && (strlen_slash_n_my_no_spaces((char*)string_b) == 0))
+    {
+        return 0;
+    }
+    else if((strlen_slash_n_my_no_spaces((char*)string_a) == 0) && (strlen_slash_n_my_no_spaces((char*)string_b) != 0))
+    {
+        return 1;
+    }
+    else if((strlen_slash_n_my_no_spaces((char*)string_a) != 0) && (strlen_slash_n_my_no_spaces((char*)string_b) == 0))
+    {
+        return -1;
+    }
+    else
+    {   
+        while((string_a != right_position_of_string_a) || (string_b != right_position_of_string_b))
+        {   
+            if((isalpha(string_a[0]) != 0) && (isalpha(string_b[0]) != 0))
+            {
+                if(tolower(string_a[0]) == tolower(string_b[0]))
+                {
+                    string_a++;
+                    string_b++;
+                } 
+                else
+                {
+                    return (tolower(string_a[0]) - tolower(string_b[0]));
+                }   
+            }
+            else if((isalpha(string_a[0]) != 0) && (isalpha(string_b[0]) == 0))
+            {
+                string_b++;
+            }
+            else if((isalpha(string_a[0]) == 0) && (isalpha(string_b[0]) != 0))
+            {
+                string_a++;
+            }
+            else
+            {
+                string_a++;
+                string_b++;
+            }
+        }
+    }   
+}
+
+size_t strlen_slash_n_my_no_spaces(char* str) // returns the length of the string
+{
+    size_t i = 0;
+    size_t count_chars = 0;
+    while (str[i] != '\n')
+    {
+        if((isspace(str[i]) == 0) && (str[i] != '\r'))
+        {
+            count_chars++;
+        }
+        i++;
+    }
+    //printf("%ld", count_chars);
+    return count_chars;
 }
 
  
