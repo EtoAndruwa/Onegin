@@ -12,7 +12,7 @@ Onegin.o: Onegin.cpp
 	gcc $(CFLAGS) Onegin.cpp
 
 prog_ex: 
-	valgrind -s --leak-check=yes --log-file="log_val.txt" ./Onegin.exe
+	valgrind -s --leak-check=full --track-origins=yes --log-file="log_val.txt" ./Onegin.exe
 
 clean: 
 	rm -rf *.o main

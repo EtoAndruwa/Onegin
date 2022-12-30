@@ -1,91 +1,86 @@
 #include "onegin.h"
 
-#define FUNC_NAME __func__
-#define FUNC_LINE __LINE__ 
+#define FUNC_NAME __func__ // Defines the function name from which was called 
+#define FUNC_LINE __LINE__ // Defines the number of line from which was called
 
-size_t count_num_of_lines_in_buf(Onegin_type* onegin) // OK
+size_t count_num_of_lines_in_buf(Onegin_type* onegin) // (OK) Counts the number of lines
 {
     size_t number_of_lines = 0;
-    size_t start = 0;
-    size_t end = 0;
 
     for(size_t i = 0; i < onegin->size_of_onegin; i++)
     {       
         if(onegin->buffer_of_chars[i] == '\n')
-        {   
-
+        {  
             number_of_lines++;
-            //printf("onegin->buffer_of_chars[%ld] line %ld\n", i, number_of_lines);
         }
-        if((onegin->buffer_of_chars[i] != '\n') && (i == (onegin->size_of_onegin - 1)))
+        if((onegin->buffer_of_chars[i] != '\n') && (i == (onegin->size_of_onegin - 1))) // If it is the last line without \n
         {
             onegin->buffer_of_chars[onegin->size_of_onegin] = '\n';
             onegin->size_of_onegin++;
             number_of_lines++;
-            //printf("onegin->buffer_of_chars[%ld] line %ld\n", (i + 1), number_of_lines);
             break;
         }
     }
     onegin->number_of_lines = number_of_lines;
-    //printf("Number of lines = %ld\n\n", onegin->number_of_lines);
     return 0;
 }
 
-FILE* check_onegin_for_openning() // OK checks the file with Onegin text for openning 
+FILE* check_onegin_for_openning() // Checks the file with original Onegin for openning 
 {
-    FILE* checked_file_onegin = fopen("Onegin_text.txt", "rb");//opens for reading
+    FILE* checked_file_onegin = fopen("Onegin_original.txt", "rb"); // Opens for reading original file 
     if(checked_file_onegin == nullptr)
     {   
-        // onegin->error_code = 1;
-        // onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
+        printf("ERROR: File with original Onegin text cannot be openned. Please, check file with original Onegin text.\n");
+        // onegin_dump(onegin, FUNC_NAME, FUNC_LINE);
         // onegin_dtor(onegin,);
-        abort(); // DELETE THIS
-        printf("ERROR: File with Onegin text cannot be openned. Please, check file with Onegin text.\n");
     }
     else
     {
-        //printf("File Onegin was openned\n");
+        printf("File \"Onegin_original.txt\" was openned\n");
         return checked_file_onegin;
     }
 }
  
-FILE* check_sorted_left_file_for_openning() // OK checks the file with sorted Onegin text for openning 
+FILE* check_sorted_left_file_for_openning() // Checks the file with sorted Onegin text for openning 
 {   
-    FILE * checked_left_file_sorted_onegin = fopen("Sorted1.txt", "wb"); 
+    FILE * checked_left_file_sorted_onegin = fopen("Onegin_sorted_left.txt", "wb"); 
     if(checked_left_file_sorted_onegin == nullptr)
     {
         printf("ERROR: File with sorted Onegin left text cannot be openned. Please, check file with sorted Onegin text.\n");
+        // onegin_dump(onegin, FUNC_NAME, FUNC_LINE);
+        // onegin_dtor(onegin,);
     }
     else
     {
-        //printf("File sorted Onegin was openned\n");
+        printf("File \"Onegin_sorted_right.txt\" was openned\n");
         return checked_left_file_sorted_onegin;
     }
 }
 
-FILE* check_sorted_right_file_for_openning() // OK checks the file with sorted Onegin text for openning 
+FILE* check_sorted_right_file_for_openning() // Checks the file with sorted Onegin text for openning 
 {   
-    FILE * checked_right_file_sorted_onegin = fopen("Sorted2.txt", "wb"); 
+    FILE * checked_right_file_sorted_onegin = fopen("Onegin_sorted_right.txt", "wb"); 
     if(checked_right_file_sorted_onegin == nullptr)
     {
         printf("ERROR: File with sorted Onegin right text cannot be openned. Please, check file with sorted Onegin text.\n");
+        // onegin_dump(onegin, FUNC_NAME, FUNC_LINE);
+        // onegin_dtor(onegin,);
     }
     else
     {
-        //printf("File sorted Onegin was openned\n");
+        printf("File \"Onegin_sorted_left.txt\" was openned\n");
         return checked_right_file_sorted_onegin;
     }
 }
 
-void create_buffer_for_chars(Onegin_type* onegin) // OK allocates memory for buffer of chars
+void create_buffer_for_chars(Onegin_type* onegin) // (OK) Allocates memory for the buffer of chars
 {
     onegin->buffer_of_chars = (char*)calloc(1, onegin->size_of_onegin * sizeof(char));
-    //printf("Onegin buffer address: %p\n\n", onegin->buffer_of_chars);
 }
 
-const char* enum_to_string(size_t code) // OK converts an enum's int value to the enum's string value 
+const char* enum_to_string(size_t error_code) // (OK) Converts an enum's int value to the enum's string value 
 {
-    switch(code)
+    switch(error_code)
     {
         case 1:
             return "ERR_OPEN_FILE_ONEGIN_TEXT";
@@ -102,24 +97,21 @@ const char* enum_to_string(size_t code) // OK converts an enum's int value to th
         case 5:
             return "ERR_CLOSE_SORTED_ONEGIN_TEXT";
             break;
-        case 6:
-            return "";
-            break;
         default:
             return "STACK IS OK"; 
             break;
     }
 }
 
-void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE) // CHECK
+void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION_LINE) // (OK) Outputs all information about the onegin stack into the LOG_FILE.txt
 {
-    FILE* logfile = fopen("LOG.txt", "a+");
+    FILE* logfile = fopen("LOG_FILE.txt", "a+");
 
-    fprintf(logfile, "-------------------START OF LOG------------------------\n\n");
+    fprintf(logfile, "-------------------START OF LOG_SESSION------------------------\n\n");
     fprintf(logfile, "Error code = %ld\n", onegin->error_code);
     fprintf(logfile, "Called from file: %s\n", __FILE__);
-    fprintf(logfile, "Called error function name: %s\n", FUNC_NAME);
-    fprintf(logfile, "Called from line: %d\n", FUNC_LINE);    
+    fprintf(logfile, "Called error function name: %s\n", FUNCTION_NAME);
+    fprintf(logfile, "Called from line: %ld\n", FUNCTION_LINE);    
     fprintf(logfile, "Date when was called: %s\n", __DATE__);
     fprintf(logfile, "Time when was called: %s\n\n", __TIME__);
 
@@ -127,33 +119,32 @@ void onegin_dump(Onegin_type* onegin, const char* FUNCTION_NAME, size_t FUNCTION
     fprintf(logfile, "Pointer to the buffer of chars: %p\n", onegin->buffer_of_chars);
     fprintf(logfile, "Current line: %ld\n", onegin->current_line);
     fprintf(logfile, "Total numver of lines: %ld\n", onegin->number_of_lines);
-    fprintf(logfile, "--------------------END OF LOG--------------------------\n\n");
+    fprintf(logfile, "--------------------END OF LOG_SESSION--------------------------\n\n");
 
     fclose(logfile);
 }
 
-void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) // OK returns the sizeof(number of chars) onegin 
+void get_num_of_chars_in_file(FILE* checked_file_onegin, Onegin_type* onegin) // (OK) Returns the sizeof(number of chars) onegin 
 {   
-    rewind(checked_file_onegin);
+    rewind(checked_file_onegin); // Returns the pointer inside the file to the initial position
 
-    fseek(checked_file_onegin, 0, SEEK_END); // puts pointer to the end of file 
-    onegin->size_of_onegin = ftell(checked_file_onegin); // returns total number of bytes (1 char = 1 byte) ->number of chars WITH \R!!!!!!!!!!
-
-    rewind(checked_file_onegin);
-    //printf("Length onegin = %ld\n", onegin->size_of_onegin);
+    fseek(checked_file_onegin, 0, SEEK_END); // Puts the pointer to the end of file 
+    onegin->size_of_onegin = ftell(checked_file_onegin); // Returns the total number of bytes (1 char = 1 byte) -> number of chars WITH \R and without EOF
+   
+    rewind(checked_file_onegin); // Returns the pointer inside the file to the initial position
 }
 
-void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_left_sorted_onegin, FILE* checked_file_right_sorted_onegin) // frees all pointers and deletes 
-{                                                                                                  // all data about onegin struct
-    free(onegin->buffer_of_chars); // frees the buffer of chars
-    for(size_t i = 0; i < onegin->number_of_lines; i++) // frees every line in the array of strings
+void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_file_left_sorted_onegin, FILE* checked_file_right_sorted_onegin) // (OK) Frees all pointers and deletes 
+{                                                                                                                                               // all data about onegin struct
+    free(onegin->buffer_of_chars); // Frees the buffer of chars
+    for(size_t i = 0; i < onegin->number_of_lines; i++) // Frees every string in the array of strings
     {
         free(onegin->strings[i]);
         onegin->strings[i] = nullptr;
     }
-    free(onegin->strings); // frees the pointer to the array of strings
+    free(onegin->strings); // Frees the pointer to the array of strings
 
-    onegin->buffer_of_chars = nullptr;
+    onegin->buffer_of_chars = nullptr; 
     onegin->strings = nullptr;
 
     onegin->current_line = 0;
@@ -166,7 +157,7 @@ void onegin_dtor(Onegin_type* onegin, FILE* checked_file_onegin, FILE* checked_f
     fclose(checked_file_right_sorted_onegin);
 }
 
-void onegin_debug_print(Onegin_type* onegin) // for debug only
+void onegin_debug_print(Onegin_type* onegin) // (OK) For debug print only
 {
     printf("buffer_of_chars: %p\n", onegin->buffer_of_chars);
     printf("strings: %p\n", onegin->strings);
@@ -180,122 +171,46 @@ void onegin_debug_print(Onegin_type* onegin) // for debug only
     }
 }
 
-void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin)
+void read_onegin_into_buf(FILE* checked_file_onegin, Onegin_type* onegin) // (OK) Reads onegin text into the buffer
 {   
-    rewind(checked_file_onegin);
-
-    //printf("Buf address: %p\n", onegin->buffer_of_chars);
-    //printf("Onegin size: %ld\n", onegin->size_of_onegin);
+    rewind(checked_file_onegin); // Returns the pointer inside the file to the initial position
     onegin->size_of_onegin = fread(onegin->buffer_of_chars, sizeof(char), onegin->size_of_onegin, checked_file_onegin);
-
-    rewind(checked_file_onegin);
-    //printf("Returned value of fread: %ld\n\n", onegin->size_of_onegin);
+    rewind(checked_file_onegin); // Returns the pointer inside the file to the initial position
 }
 
-// void onegin_struct_check(Onegin_type* onegin, const char * FUNCTION_NAME, size_t FUNCTION_LINE)
-// {
-//     if(onegin->buffer_of_chars == nullptr)
-//     {
-//         onegin->error_code = ERR_NULLPTR_BUFFER;
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if(onegin->strings == nullptr)
-//     {
-//         onegin->error_code = ERR_NULLPTR_STRINGS;
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if(onegin->current_line < 0)
-//     {
-//         onegin->error_code = ERR_NEGATIVE_CUR_LINE;
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if(onegin->number_of_lines < 0)
-//     {
-//         onegin->error_code = ERR_NEGATIVE_NUM_LINES;
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if(onegin->size_of_onegin == 0)
-//     {   
-//         onegin->error_code = ERR_EMPTY_FILE_ONEGIN_TEXT;
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if()
-//     {
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if()
-//     {
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-//     else if()
-//     {
-//         onegin_dump(onegin, FUNCTION_NAME, FUNCTION_LINE);
-//         onegin_dtor(onegin, checked_file_onegin, checked_file_sorted_onegin);
-//         abort();
-//     }
-
-void create_array_strings(Onegin_type* onegin)
+void create_array_strings(Onegin_type* onegin) // (OK) Creates the array of strings 
 {
     onegin->strings = (char**)calloc(1, onegin->number_of_lines * sizeof(char*));   
-    //printf("Address of array of pointer to strings: %p\n", onegin->strings);
 }
 
-char* get_string(Onegin_type* onegin) // gets pointer to the string
+char* get_string(Onegin_type* onegin) // (OK) Gets the pointer to the string
 {
     char* string = nullptr;
-
-    char* start_of_string = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]); // stores old position of start
-    char* end_of_string = strchr_slash_n_my(onegin); // stores position of the end of the string
-
-    // if(check_for_spaces == 0)
-    // {
-    //     printf("Start of new line %ld, Start %p, End %p, length %ld\n", onegin->position_of_line_in_buffer, start_of_string,end_of_string, (end_of_string - start_of_string)+1);
-    //     string = (char*)calloc(1, ((end_of_string - start_of_string) + 1) * sizeof(char)); 
-    //     string = strncpy(string, start_of_string, (end_of_string - start_of_string) + 1); // copies characters from the buffer to the allocated memory cell
-    //     return string;
-    // }
-    // else
-    // {
-    //     onegin->position_of_line_in_buffer = onegin->position_of_line_in_buffer + (end_of_string - start_of_string);
-    //     return string;
-    // }
-
-    //printf("Start of new line %ld, Start %p, End %p, length %ld\n", onegin->position_of_line_in_buffer, start_of_string,end_of_string, (end_of_string - start_of_string)+1);
+    char* start_of_string = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]); // Stores the old position of start 
+    char* end_of_string = strchr_slash_n_my(onegin); // Stores position of the end of the string
+    
     string = (char*)calloc(1, ((end_of_string - start_of_string) + 1) * sizeof(char)); 
-    string = strncpy(string, start_of_string, (end_of_string - start_of_string) + 1); // copies characters from the buffer to the allocated memory cell
+    string = strncpy(string, start_of_string, (end_of_string - start_of_string) + 1); // Copies characters from the buffer to the allocated memory cell
     return string;
 }
 
-void fill_the_array (Onegin_type* onegin) // fills the array with pointers to the string
+void fill_the_array (Onegin_type* onegin) // (OK) Fills the array with pointers to the string
 {
     for(size_t i = 0; i < onegin->number_of_lines; i++)
     {
-        onegin->strings[i] = get_string(onegin); // gets pointer to the next string form the buffer
+        onegin->strings[i] = get_string(onegin); // Gets the pointer to the next string form the buffer
     }
 }
 
-char* strchr_slash_n_my(Onegin_type* onegin)  // modified to search the character from specified position
+char* strchr_slash_n_my(Onegin_type* onegin) // (OK) Searches the end of the next line 
 {    
     char* position = nullptr;
+
     while(onegin->position_of_line_in_buffer < onegin->size_of_onegin)     
     {
         if(onegin->buffer_of_chars[onegin->position_of_line_in_buffer] == '\n')
         {   
-            position = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]);
+            position = &(onegin->buffer_of_chars[onegin->position_of_line_in_buffer]); // Makes the end of the previous line into start of the new one
             onegin->position_of_line_in_buffer++;
             return position;
         }
@@ -306,7 +221,7 @@ char* strchr_slash_n_my(Onegin_type* onegin)  // modified to search the characte
     }                                                                            
 }
 
-void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_openning) // prints all array of strings into the file Sorted_Onegin_text.txt
+void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_openning) // (OK) Prints ALL ARRAY OF STRING into the file Onegin_sorted_-----.txt
 {   
     for(size_t i = 0; i < onegin->number_of_lines; i++)
     {
@@ -314,83 +229,72 @@ void print_strings_to_file(Onegin_type* onegin, FILE* check_sorted_file_for_open
     }
 }
 
-void fputs_my(char* string_to_fputs, FILE* check_sorted_file_for_openning) // prints string into the file Sorted_Onegin_text.txt
+void fputs_my(char* string_to_fputs, FILE* check_sorted_file_for_openning) // (OK) Prints ONLY ONE STRING into the file Onegin_sorted_-----.txt
 {   
-    //printf("%p", string_to_fputs);
     size_t length = strlen_slash_n_my(string_to_fputs);
-    //printf("%ld\n", length);
+
     for(size_t i = 0; i < length; i++)
     {
         fputc(string_to_fputs[i], check_sorted_file_for_openning);
     }
 }
 
-size_t strlen_slash_n_my(char* str) // returns the length of the string
+size_t strlen_slash_n_my(char* str) // (OK) Returns the length of the string with \n and without \r
 {
-    size_t i = 0;
-    while (str[i] != '\n')
+    size_t length = 0;
+
+    while (str[length] != '\n')
     {
-        i++;
+        length++;
     }
-    return i;
+
+    return length;
 }
 
-int comparator_left_to_right(const void* string_a, const void* string_b) // used in order to compare two strings
+int comparator_left_to_right(const void* string_a, const void* string_b) // (OK) Used in order to compare two strings (TI_THE_RIGHT_SORT)
 {
-    return strcmp_my(*(const char **)string_a, *(const char **)string_b);
+    return strcmp_left_to_right(*(const char **)string_a, *(const char **)string_b);
 }
 
-void sort_strings(Onegin_type* onegin, FILE* check_sorted_file_left_for_openning, FILE* check_sorted_file_right_for_openning) // sorts array of strings
+int comparator_right_to_left(const void* string_a, const void* string_b) // (OK) Used in order to compare two strings (TO_THE_LEFT_SORT)
+{
+    return strcmp_right_to_left(*(const char **)string_a, *(const char **)string_b);
+}
+
+void sort_strings(Onegin_type* onegin, FILE* check_sorted_file_left_for_openning, FILE* check_sorted_file_right_for_openning) // (OK) Sorts the array of strings
 {   
     qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator_left_to_right);
     print_strings_to_file(onegin, check_sorted_file_left_for_openning);
+
     qsort(onegin->strings, onegin->number_of_lines, sizeof(char*), comparator_right_to_left);
     print_strings_to_file(onegin, check_sorted_file_right_for_openning);  
 }
 
-// int check_for_spaces(char* start_of_string, char* end_of_string) // checks for empty strings
-// {
-//     int flag = 0;
-//     size_t i = 0;
-//     while(i < end_of_string - start_of_string)
-//     {
-//         if(isspace((int)start_of_string[i]))
-//         {
-//             flag = 1;
-//         }
-//         else
-//         {
-//             flag = 0;
-//             break;
-//         }
-//         i++;
-//     }
-//     return flag;
-// }
-
-int comparator_right_to_left(const void* string_a, const void* string_b) // used in order to compare two strings
+int strcmp_right_to_left(const char* string_a, const char* string_b) // (OK) Sorts the onegin from the right to the left 
 {   
-    size_t length_string_a = strlen_slash_n_my(*(char**)string_a);
-    size_t length_string_b = strlen_slash_n_my(*(char**)string_b);
+    size_t length_string_a = strlen_slash_n_my((char*)string_a);
+    size_t length_string_b = strlen_slash_n_my((char*)string_b);
+    size_t length_string_a_no_spaces = strlen_slash_n_my_no_spaces((char*)string_a); 
+    size_t length_string_b_no_spaces = strlen_slash_n_my_no_spaces((char*)string_b); 
 
-    char* right_position_of_string_a = *(char**)string_a + length_string_a;
-    char* right_position_of_string_b = *(char**)string_b + length_string_b;
+    char* right_position_of_string_a = (char*)string_a + length_string_a;
+    char* right_position_of_string_b = (char*)string_b + length_string_b;
 
-    if((strlen_slash_n_my_no_spaces(*(char**)string_a) == 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) == 0))
+    if((length_string_a_no_spaces == 0) && (length_string_b_no_spaces == 0))
     {
         return 0;
     }
-    else if((strlen_slash_n_my_no_spaces(*(char**)string_a) == 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) != 0))
+    else if((length_string_a_no_spaces == 0) && (length_string_b_no_spaces != 0))
     {
         return 1;
     }
-    else if((strlen_slash_n_my_no_spaces(*(char**)string_a) != 0) && (strlen_slash_n_my_no_spaces(*(char**)string_b) == 0))
+    else if((length_string_a_no_spaces != 0) && (length_string_b_no_spaces == 0))
     {
         return -1;
     }
     else
     {  
-        while((*(char**)string_a != right_position_of_string_a) || (*(char**)string_b != right_position_of_string_b))
+        while(((char*)string_a != right_position_of_string_a) || ((char*)string_b != right_position_of_string_b))
         {
             if((isalpha(right_position_of_string_a[0]) != 0) && (isalpha(right_position_of_string_b[0]) != 0))
             {
@@ -405,7 +309,7 @@ int comparator_right_to_left(const void* string_a, const void* string_b) // used
                 }
             }
             else if((isalpha(right_position_of_string_a[0]) != 0) && (isalpha(right_position_of_string_b[0]) == 0))
-            {
+            {   
                 right_position_of_string_b--;
             }
             else if((isalpha(right_position_of_string_a[0]) == 0) && (isalpha(right_position_of_string_b[0]) != 0))
@@ -415,29 +319,31 @@ int comparator_right_to_left(const void* string_a, const void* string_b) // used
             else
             {
                 right_position_of_string_a--;
-                right_position_of_string_a--;
+                right_position_of_string_b--;
             }
         }
     }
 }
 
-int strcmp_my(const char* string_a, const char* string_b)
+int strcmp_left_to_right(const char* string_a, const char* string_b) // (OK) Sorts the onegin from the left to the right 
 {   
     size_t length_string_a = strlen_slash_n_my((char*)string_a);
     size_t length_string_b = strlen_slash_n_my((char*)string_b);
+    size_t length_string_a_no_spaces = strlen_slash_n_my_no_spaces((char*)string_a);
+    size_t length_string_b_no_spaces = strlen_slash_n_my_no_spaces((char*)string_b);
 
     char* right_position_of_string_a = (char*)string_a + length_string_a;
     char* right_position_of_string_b = (char*)string_b + length_string_b;
 
-    if((strlen_slash_n_my_no_spaces((char*)string_a) == 0) && (strlen_slash_n_my_no_spaces((char*)string_b) == 0))
+    if((length_string_a_no_spaces == 0) && (right_position_of_string_b == 0))
     {
         return 0;
     }
-    else if((strlen_slash_n_my_no_spaces((char*)string_a) == 0) && (strlen_slash_n_my_no_spaces((char*)string_b) != 0))
+    else if((length_string_a_no_spaces == 0) && (right_position_of_string_b != 0))
     {
         return 1;
     }
-    else if((strlen_slash_n_my_no_spaces((char*)string_a) != 0) && (strlen_slash_n_my_no_spaces((char*)string_b) == 0))
+    else if((length_string_a_no_spaces != 0) && (right_position_of_string_b == 0))
     {
         return -1;
     }
@@ -474,7 +380,7 @@ int strcmp_my(const char* string_a, const char* string_b)
     }   
 }
 
-size_t strlen_slash_n_my_no_spaces(char* str) // returns the length of the string
+size_t strlen_slash_n_my_no_spaces(char* str) // (OK) Returns the length of the string without \r, \n and spaces
 {
     size_t i = 0;
     size_t count_chars = 0;
@@ -486,7 +392,6 @@ size_t strlen_slash_n_my_no_spaces(char* str) // returns the length of the strin
         }
         i++;
     }
-    //printf("%ld", count_chars);
     return count_chars;
 }
 
